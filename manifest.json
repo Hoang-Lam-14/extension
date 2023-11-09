@@ -1,0 +1,35 @@
+{
+	"name": "Subiz widget check",
+	"description": "Tools to check Subiz widget was installed",
+	"version": "0.0.1.0",
+	"version_name": "0.0.1",
+	"manifest_version": 3,
+	"action": {
+		"default_popup": "popup/index.html",
+		"default_icon": {
+			"16": "images/icon-16.png",
+			"32": "images/icon_32.png",
+			"48": "images/icon_64.png",
+			"128": "images/icon_128.png"
+		}
+	},
+	"content_scripts": [
+		{
+			"js": ["content-script.js"],
+			"matches": ["*://*/*"],
+			"run_at": "document_end"
+		}
+	],
+	"host_permissions": ["*://*/*"],
+	"permissions": ["storage", "activeTab", "identity", "scripting"],
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "resources": [
+        "script.js"
+      ]
+    }
+  ]
+}
