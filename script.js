@@ -1,3 +1,5 @@
+// script to inject to webpage so if you want to retrieve GLOBAL_VARIABLE from webpage
+
 console.log('script.jssssssssssssss')
 setTimeout(function () {
 	/* Example: Send data from the page to your Chrome extension */
