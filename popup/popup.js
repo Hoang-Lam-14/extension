@@ -19,7 +19,13 @@ $btn_reset.addEventListener('click', function (e) {
 	$result.innerHTML = ''
 })
 
-function buildResultHtml({subiz_widget_loaded, subiz_code_in_source, has_time_out}) {
+function buildResultHtml({
+	subiz_widget_loaded,
+	subiz_code_in_source,
+	has_time_out,
+	subiz_widget_displayed,
+	subiz_widget_opacity_1,
+}) {
 	let $code = subiz_code_in_source
 		? '<div class="has-text-success">✓ Phát hiện mã nhúng trong code web</div>'
 		: '<div class="has-text-danger">✕ Không có mã nhúng trong code web</div>'
@@ -29,15 +35,22 @@ function buildResultHtml({subiz_widget_loaded, subiz_code_in_source, has_time_ou
 	let reason = ''
 	if (!subiz_widget_loaded && subiz_code_in_source) {
 		reason = 'Mã nhúng có thể bị đặt sai vị trí hoặc sai cú pháp, vui lòng báo đội Tech kiểm tra'
-    if (has_time_out) {
-		  reason = 'Mã nhúng nằm trong <code>setTimeout</code>, vui lòng đợi giây lát và check lại'
-    }
-	} else if (subiz_widget_loaded && !subiz_code_in_source) {
-    reason = 'Mã nhúng có thể được đặt trong các công cụ khác như Google Tag Manager, ...'
+		if (has_time_out) {
+			reason = 'Mã nhúng nằm trong <code>setTimeout</code> nên CSC sẽ đc tải sau vài giây, vui lòng đợi giây lát và check lại'
+		}
+	} else if (subiz_widget_loaded) {
+		if (!subiz_code_in_source) {
+			reason = 'Mã nhúng có thể được đặt trong các công cụ khác như Google Tag Manager, ...'
+		}
+		if (!subiz_widget_displayed) {
+			reason = 'CSC có thể được cài đặt hiển thị sau vài giây. Vui lòng kiểm tra thử settings của khách hàng'
+		} else if (!subiz_widget_opacity_1) {
+			reason = 'CSC đang tải Avatar của agent, doanh nghiệp. Vui lòng đợi giây lát và kiểm tra lại'
+		}
 	}
 
 	let $result = document.querySelector('#result')
-  let resultHTML = `${$code} ${$loaded}`
-  if (reason) resultHTML += `<div class="has-text-gray">${reason}</div>`
+	let resultHTML = `${$code} ${$loaded}`
+	if (reason) resultHTML += `<div class="has-text-grey mt-1">${reason}</div>`
 	$result.innerHTML = resultHTML
 }
