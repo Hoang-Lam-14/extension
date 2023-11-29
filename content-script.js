@@ -6,6 +6,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 	}
 
 	let $widget = document.querySelector('#wpwidget, [sbz-data="widget"]')
+	let accId = $widget ? $widget.getAttribute('sbz-plugin-account-id') : null
 	let {subiz_code_in_source, has_time_out} = findSubizScriptTag()
 
 	let $widgetLayout = document.querySelector('.desktop .widget-layout, .mobile .widget-layout')
@@ -16,13 +17,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 		subiz_widget_loaded: $widget ? true : false,
 		subiz_widget_displayed: $widgetLayout ? true : false,
 		subiz_widget_opacity_1: $widgetLayout ? $widgetLayout.style.opacity === '1' : false,
+		accId,
 	})
 })
 
 console.log('content_scriptssssssss')
 
 function hasEmbededCode(str = '') {
-	return str.indexOf('!function') > -1 && str.indexOf('setAccount') > -1 && str.indexOf('_subiz_init_') > -1 && str.indexOf('widget.subiz.net')
+	return (
+		str.indexOf('!function') > -1 &&
+		str.indexOf('setAccount') > -1 &&
+		str.indexOf('_subiz_init_') > -1 &&
+		str.indexOf('widget.subiz.net')
+	)
 }
 
 function findSubizScriptTag() {

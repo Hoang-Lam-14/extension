@@ -1,7 +1,11 @@
 console.log('popup hello world')
 
+const [tab] = await chrome.tabs.query({active: true, lastFocusedWindow: true})
+const response = await chrome.tabs.sendMessage(tab.id, {type: 'check_widget_code'})
+buildResultHtml(response)
+
 const $btn_check = document.querySelector('#btn_check')
-const $btn_reset = document.querySelector('#btn_reset')
+//const $btn_reset = document.querySelector('#btn_reset')
 
 $btn_check.addEventListener('click', function (e) {
 	;(async () => {
@@ -10,14 +14,16 @@ $btn_check.addEventListener('click', function (e) {
 		const response = await chrome.tabs.sendMessage(tab.id, {type: 'check_widget_code'})
 		// do something with response here, not outside the function
 		console.log(response)
+		if (response.subiz_widget_loaded) chrome.action.setIcon({path: '/images/subiz_icon_active.png', tabId: tab.id})
+		else chrome.action.setIcon({path: '/images/subiz_icon_inactive.png', tabId: tab.id})
 		buildResultHtml(response)
 	})()
 })
 
-$btn_reset.addEventListener('click', function (e) {
-	let $result = document.querySelector('#result')
-	$result.innerHTML = ''
-})
+//$btn_reset.addEventListener('click', function (e) {
+//let $result = document.querySelector('#result')
+//$result.innerHTML = ''
+//})
 
 function buildResultHtml({
 	subiz_widget_loaded,
@@ -25,7 +31,11 @@ function buildResultHtml({
 	has_time_out,
 	subiz_widget_displayed,
 	subiz_widget_opacity_1,
+	accId,
 }) {
+	let $accId = accId
+		? `<div class="has-text-success">✓ Tài khoản: ${accId}</div>`
+		: `<div class="has-text-danger">✕ Không có tài khoản</div>`
 	let $code = subiz_code_in_source
 		? '<div class="has-text-success">✓ Phát hiện mã nhúng trong code web</div>'
 		: '<div class="has-text-danger">✕ Không có mã nhúng trong code web</div>'
@@ -36,7 +46,8 @@ function buildResultHtml({
 	if (!subiz_widget_loaded && subiz_code_in_source) {
 		reason = 'Mã nhúng có thể bị đặt sai vị trí hoặc sai cú pháp, vui lòng báo đội Tech kiểm tra'
 		if (has_time_out) {
-			reason = 'Mã nhúng nằm trong <code>setTimeout</code> nên CSC sẽ đc tải sau vài giây, vui lòng đợi giây lát và check lại'
+			reason =
+				'Mã nhúng nằm trong <code>setTimeout</code> nên CSC sẽ đc tải sau vài giây, vui lòng đợi giây lát và check lại'
 		}
 	} else if (subiz_widget_loaded) {
 		if (!subiz_code_in_source) {
@@ -50,7 +61,7 @@ function buildResultHtml({
 	}
 
 	let $result = document.querySelector('#result')
-	let resultHTML = `${$code} ${$loaded}`
+	let resultHTML = `${$accId} ${$code} ${$loaded}`
 	if (reason) resultHTML += `<div class="has-text-grey mt-1">${reason}</div>`
 	$result.innerHTML = resultHTML
 }
